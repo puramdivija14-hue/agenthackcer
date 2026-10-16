@@ -1,30 +1,44 @@
 /**
  * APPLICATION CONFIGURATION
- * Stores API keys, model parameters, and default settings.
+ * Stores API keys, backend URL, model parameters, and storage keys.
  * 
- * Paste your Gemini API key below, or configure it securely in the UI
- * under Backup & Settings -> Gemini AI API Configuration.
+ * DEPLOYMENT ARCHITECTURE:
+ * - Frontend: Deployed on Vercel (static web app)
+ * - Backend: Deployed on Render (Node.js/Express API service)
  */
 
 const APP_CONFIG = {
-  // Enter your Gemini API Key here (or configure via UI settings)
+  // Render Backend URL (Leave empty to use client-side or enter your deployed Render URL)
+  // Example: 'https://opportunity-radar-backend.onrender.com'
+  BACKEND_URL: '',
+
+  // Optional direct Gemini API Key for standalone / client-side operation
+  // When Render Backend is connected, the API key stays secured on the Render server!
   GEMINI_API_KEY: '',
   
-  // Available models with automatic fallback
+  // Fallback Gemini models
   GEMINI_MODELS: [
-    'gemini-3.5-flash-lite',
-    'gemini-3.8-flash',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
     'gemini-flash-latest'
   ],
   
-  // API Endpoint
+  // Direct Google Generative Language API Endpoint
   API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta/models',
 
-  // Local storage override key (allows user to update or customize key via UI settings)
-  STORAGE_KEY_API: 'opportunity_agent_custom_api_key'
+  // LocalStorage keys for settings persistence
+  STORAGE_KEY_API: 'opportunity_agent_custom_api_key',
+  STORAGE_KEY_BACKEND: 'opportunity_agent_backend_url'
 };
 
-// Helper function to resolve active API Key (checks localStorage override first, falls back to config)
+// Helper function to resolve active Render Backend URL
+function getActiveBackendUrl() {
+  const customBackend = localStorage.getItem(APP_CONFIG.STORAGE_KEY_BACKEND);
+  const url = (customBackend && customBackend.trim()) ? customBackend.trim() : APP_CONFIG.BACKEND_URL;
+  return url ? url.replace(/\/+$/, '') : ''; // Remove trailing slashes
+}
+
+// Helper function to resolve active client-side API Key (if backend is not used)
 function getActiveApiKey() {
   const customKey = localStorage.getItem(APP_CONFIG.STORAGE_KEY_API);
   return (customKey && customKey.trim()) ? customKey.trim() : APP_CONFIG.GEMINI_API_KEY;

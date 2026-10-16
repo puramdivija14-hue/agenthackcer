@@ -5,3 +5,11 @@ desktop.ini
 
 # Logs and environment
 *.log
+.env
+.env.*
+!.env.example
+
+# Node dependencies
+node_modules/
+dist/
+.vercel

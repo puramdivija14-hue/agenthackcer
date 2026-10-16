@@ -2557,12 +2557,34 @@
   // 16. GEMINI AI CLIENT & AI SCOUT CONTROLLER
   // ==========================================================================
   async function callGeminiAPI(promptText) {
-    const apiKey = typeof getActiveApiKey === 'function' ? getActiveApiKey() : APP_CONFIG.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('No API key configured. Please configure an API key in Backup & Settings.');
+    const backendUrl = typeof getActiveBackendUrl === 'function' ? getActiveBackendUrl() : '';
+
+    // Route through Render backend if configured
+    if (backendUrl) {
+      try {
+        const resp = await fetch(`${backendUrl}/api/gemini/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.text) return data.text;
+        } else {
+          const errData = await resp.json().catch(() => ({}));
+          console.warn(`Render backend returned error ${resp.status}:`, errData.error);
+        }
+      } catch (backendErr) {
+        console.warn('Render backend unreachable, checking client-side key fallback:', backendErr);
+      }
     }
 
-    const models = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.GEMINI_MODELS) ? APP_CONFIG.GEMINI_MODELS : ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
+    const apiKey = typeof getActiveApiKey === 'function' ? getActiveApiKey() : APP_CONFIG.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error(backendUrl ? 'Render backend unreachable and no client-side API key configured.' : 'No API key configured. Please configure an API key or Render Backend in Backup & Settings.');
+    }
+
+    const models = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.GEMINI_MODELS) ? APP_CONFIG.GEMINI_MODELS : ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
     let lastError = null;
 
     for (const model of models) {
@@ -3053,6 +3075,108 @@ Output strictly valid JSON array without markdown fences:
         }
       });
     }
+
+    // 15. Render Cloud Backend Deployment Controls
+    const inputBackendUrl = document.getElementById('inputBackendUrl');
+    const btnSaveBackendUrl = document.getElementById('btnSaveBackendUrl');
+    const btnTestBackendHealth = document.getElementById('btnTestBackendHealth');
+    const btnClearBackendUrl = document.getElementById('btnClearBackendUrl');
+    const backendTestStatus = document.getElementById('backendTestStatus');
+    const renderStatusText = document.getElementById('renderStatusText');
+    const chipRenderStatus = document.getElementById('chipRenderStatus');
+
+    function refreshBackendDisplay() {
+      const activeUrl = typeof getActiveBackendUrl === 'function' ? getActiveBackendUrl() : '';
+      if (inputBackendUrl) inputBackendUrl.value = activeUrl;
+      if (renderStatusText && chipRenderStatus) {
+        if (activeUrl) {
+          renderStatusText.textContent = 'Configured';
+          chipRenderStatus.className = 'deploy-chip connected';
+        } else {
+          renderStatusText.textContent = 'Client-Side Mode';
+          chipRenderStatus.className = 'deploy-chip';
+        }
+      }
+    }
+
+    refreshBackendDisplay();
+
+    if (btnSaveBackendUrl) {
+      btnSaveBackendUrl.addEventListener('click', () => {
+        const val = inputBackendUrl ? inputBackendUrl.value.trim().replace(/\/+$/, '') : '';
+        if (val) {
+          localStorage.setItem(APP_CONFIG.STORAGE_KEY_BACKEND, val);
+          showToast('Backend Saved', 'Render API Service URL configured.', 'success');
+        } else {
+          localStorage.removeItem(APP_CONFIG.STORAGE_KEY_BACKEND);
+          showToast('Backend Cleared', 'Switched to client-side mode.', 'info');
+        }
+        refreshBackendDisplay();
+      });
+    }
+
+    if (btnClearBackendUrl) {
+      btnClearBackendUrl.addEventListener('click', () => {
+        localStorage.removeItem(APP_CONFIG.STORAGE_KEY_BACKEND);
+        if (inputBackendUrl) inputBackendUrl.value = '';
+        refreshBackendDisplay();
+        if (backendTestStatus) backendTestStatus.textContent = '';
+        showToast('Reset to Client-Side', 'Using direct browser requests.', 'info');
+      });
+    }
+
+    if (btnTestBackendHealth) {
+      btnTestBackendHealth.addEventListener('click', async () => {
+        const url = (inputBackendUrl && inputBackendUrl.value.trim()) 
+          ? inputBackendUrl.value.trim().replace(/\/+$/, '') 
+          : (typeof getActiveBackendUrl === 'function' ? getActiveBackendUrl() : '');
+
+        if (!url) {
+          if (backendTestStatus) {
+            backendTestStatus.textContent = '⚠️ Enter your Render backend URL above first (e.g. https://your-app.onrender.com).';
+            backendTestStatus.style.color = 'var(--orange-accent)';
+          }
+          return;
+        }
+
+        if (backendTestStatus) {
+          backendTestStatus.textContent = `⏳ Pinging ${url}/health...`;
+          backendTestStatus.style.color = 'var(--text-muted)';
+        }
+
+        const t0 = performance.now();
+        try {
+          const resp = await fetch(`${url}/health`, { method: 'GET' });
+          const latency = Math.round(performance.now() - t0);
+          if (resp.ok) {
+            const data = await resp.json();
+            const geminiInfo = data.geminiConfigured ? '🟢 Gemini API Key configured on server' : '⚠️ Server online, but GEMINI_API_KEY env var is missing on Render';
+            if (backendTestStatus) {
+              backendTestStatus.textContent = `✅ Render Backend Online (${latency}ms) — ${geminiInfo}`;
+              backendTestStatus.style.color = data.geminiConfigured ? 'var(--green)' : 'var(--orange-accent)';
+            }
+            if (chipRenderStatus && renderStatusText) {
+              renderStatusText.textContent = `Online (${latency}ms)`;
+              chipRenderStatus.className = 'deploy-chip connected';
+            }
+            showToast('Backend Online', `Render server verified (${latency}ms)`, 'success');
+          } else {
+            throw new Error(`HTTP ${resp.status}`);
+          }
+        } catch (err) {
+          const latency = Math.round(performance.now() - t0);
+          if (backendTestStatus) {
+            backendTestStatus.textContent = `❌ Unable to reach Render service: ${err.message} (${latency}ms). (Note: Render free tier can take ~50s to wake from sleep)`;
+            backendTestStatus.style.color = 'var(--danger)';
+          }
+          if (chipRenderStatus && renderStatusText) {
+            renderStatusText.textContent = 'Unreachable';
+            chipRenderStatus.className = 'deploy-chip offline';
+          }
+          showToast('Backend Error', err.message, 'warning');
+        }
+      });
+    }
   }
 
   // ==========================================================================
@@ -3329,14 +3453,54 @@ Student query:
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
       try {
-        const prompt = buildCopilotSystemPrompt(text);
         let aiRawResponse = '';
+        const backendUrl = typeof getActiveBackendUrl === 'function' ? getActiveBackendUrl() : '';
 
-        try {
-          aiRawResponse = await callGeminiAPI(prompt);
-        } catch (apiErr) {
-          console.warn('Chatbot Gemini API call failed, using intelligent local response:', apiErr);
-          aiRawResponse = generateLocalFallbackResponse(text);
+        // If Render backend is configured, attempt /api/chat with full context
+        if (backendUrl) {
+          try {
+            const urgentList = state.opportunities.filter(o => {
+              if (o.status === 'Completed') return false;
+              const c = calculateDaysRemaining(o.deadline);
+              return c.diffDays >= 0 && c.diffDays <= 7;
+            });
+            const pendingList = state.reminders.filter(r => !r.completed);
+
+            const chatResp = await fetch(`${backendUrl}/api/chat`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: text,
+                history: chatHistory.slice(-4),
+                context: {
+                  todayIST: getTodayIST(),
+                  urgentCount: urgentList.length,
+                  pendingTasksCount: pendingList.length,
+                  opportunitiesSummary: urgentList.slice(0, 5).map(o => `• ${o.title} (Deadline: ${o.deadline})`).join('\n') || 'None',
+                  remindersSummary: pendingList.slice(0, 5).map(r => `• ${r.title} (Due: ${r.dueDate})`).join('\n') || 'None'
+                }
+              })
+            });
+
+            if (chatResp.ok) {
+              const chatData = await chatResp.json();
+              if (chatData && chatData.text) {
+                aiRawResponse = chatData.text;
+              }
+            }
+          } catch (chatErr) {
+            console.warn('Render /api/chat error, falling back to direct prompt:', chatErr);
+          }
+        }
+
+        if (!aiRawResponse) {
+          const prompt = buildCopilotSystemPrompt(text);
+          try {
+            aiRawResponse = await callGeminiAPI(prompt);
+          } catch (apiErr) {
+            console.warn('Chatbot Gemini API call failed, using intelligent local response:', apiErr);
+            aiRawResponse = generateLocalFallbackResponse(text);
+          }
         }
 
         let actionExecutedLabel = null;

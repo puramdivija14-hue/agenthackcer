@@ -92,12 +92,89 @@ The application implements a custom curated palette engineered for readability, 
 
 ```text
 divija98276/
-├── config.js         # API keys (Gemini), model configuration & key masking
-├── index.html        # Semantic HTML5 layout, accessible dialogs, AI Scout, and navigation
-├── style.css         # Modern styling, cream/purple/green/orange palette, dark/light theme
-├── script.js         # Vanilla ES6+ controller, Gemini client, localStorage CRUD, IST calculations
-└── README.md         # Comprehensive documentation, API setup & Apps Script guide
+├── vercel.json           # Vercel configuration for static frontend hosting
+├── render.yaml           # Render Blueprint for 1-click backend web service deployment
+├── config.js             # API keys, Render Backend URL, model configuration & key masking
+├── index.html            # Semantic HTML5 layout, accessible dialogs, AI Scout, and navigation
+├── style.css             # Modern styling, cream/purple/green/orange palette, dark/light theme
+├── script.js             # Vanilla ES6+ controller, Gemini client, localStorage CRUD, IST calculations
+├── README.md             # Comprehensive documentation, API setup, Vercel & Render guide
+└── server/               # Render Backend Service (Node.js & Express)
+    ├── package.json      # Express, CORS, and Dotenv dependencies
+    ├── server.js         # API gateway with Gemini endpoints, health check & CORS
+    ├── .env.example      # Template for environment variables (GEMINI_API_KEY, PORT)
+    ├── .gitignore        # Ignores server node_modules & .env
+    └── README.md         # Backend deployment instructions
 ```
+
+---
+
+## ☁️ Cloud Deployment Guide: Vercel (Frontend) & Render (Backend)
+
+The project is structured with a decoupled modern architecture:
+- **Frontend (Vercel):** Lightning-fast global CDN for static assets (`index.html`, `style.css`, `script.js`).
+- **Backend (Render):** Secure Node.js Express API service for server-side Google Gemini intelligence, keeping your API key 100% secret and safe from browser exposure.
+
+---
+
+### Part 1: Deploy Backend to Render (Node.js API)
+
+1. **Sign in to Render:** Go to [dashboard.render.com](https://dashboard.render.com) and log in with your GitHub account.
+2. **Create New Web Service:**
+   - Click **New +** -> **Web Service**.
+   - Select **Build and deploy from a Git repository**.
+   - Choose your repository: `puramdivija14-hue/agenthackcer`.
+3. **Configure Service Settings:**
+   - **Name:** `opportunity-radar-backend` (or any custom name)
+   - **Region:** Singapore / Frankfurt / Oregon
+   - **Branch:** `main`
+   - **Root Directory:** `server` *(Important: set this to `server`)*
+   - **Runtime:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Instance Type:** `Free`
+4. **Configure Environment Variables:**
+   Under **Environment Variables**, click **Add Environment Variable**:
+   - `GEMINI_API_KEY`: Paste your Google Gemini API key (from [Google AI Studio](https://aistudio.google.com/app/apikey))
+   - `CORS_ORIGIN`: `*` (or your future Vercel domain e.g. `https://*.vercel.app`)
+   - `NODE_ENV`: `production`
+5. **Deploy:** Click **Create Web Service**.
+6. **Copy Your Backend URL:**
+   Once the status turns to **Live**, copy your public Render URL (e.g., `https://opportunity-radar-backend.onrender.com`).
+   - You can test it by visiting: `https://opportunity-radar-backend.onrender.com/health`
+
+---
+
+### Part 2: Deploy Frontend to Vercel (Static Web App)
+
+1. **Sign in to Vercel:** Go to [vercel.com](https://vercel.com) and log in with your GitHub account.
+2. **Import Repository:**
+   - Click **Add New...** -> **Project**.
+   - Under *Import Git Repository*, select `puramdivija14-hue/agenthackcer`.
+3. **Configure Project:**
+   - **Framework Preset:** `Other` (or leave default detected)
+   - **Root Directory:** `./` (leave default)
+   - **Build and Output Settings:** Leave default (the repository includes `vercel.json` for automatic configuration)
+4. **Deploy:** Click **Deploy**.
+5. **Get Live URL:** In less than 30 seconds, Vercel will provide your live URL (e.g., `https://agenthackcer.vercel.app`).
+
+---
+
+### Part 3: Link Vercel Frontend to Render Backend
+
+Once both are deployed:
+1. Open your deployed Vercel frontend in your browser.
+2. In the sidebar, go to **Backup & Settings**.
+3. Locate the **Cloud Deployment: Vercel (Frontend) & Render (Backend)** card.
+4. In the **Render Backend Service URL** field, paste your Render URL:
+   ```text
+   https://opportunity-radar-backend.onrender.com
+   ```
+5. Click **Save Backend URL**, then click **⚡ Ping Backend (/health)** to test the live connection!
+   - You will see: `✅ Render Backend Online (120ms) — 🟢 Gemini API Key configured on server`.
+6. That's it! Your Radar Copilot Chatbot and AI Scout will now execute through your secure Render backend.
+
+---
 
 ---
 

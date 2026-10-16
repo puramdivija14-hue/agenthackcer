@@ -919,6 +919,38 @@
             </div>
           </div>
 
+          <!-- Cloud Backend (Render) & Vercel Deployment Card -->
+          <div class="settings-card deployment-settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon purple">🚀</div>
+              <div>
+                <h3>Cloud Deployment: Vercel (Frontend) & Render (Backend)</h3>
+                <p>Deploy your frontend statically on Vercel and run your Node.js/Express API service on Render to keep API keys secure.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="deployment-badges-row">
+                <span class="deploy-chip" id="chipVercelStatus">▲ Vercel: <strong>Static Ready</strong></span>
+                <span class="deploy-chip" id="chipRenderStatus">● Render Backend: <strong id="renderStatusText">Client-Side Mode</strong></span>
+              </div>
+              <div class="form-group" style="margin-top: 10px;">
+                <label for="inputBackendUrl">Render Backend Service URL</label>
+                <input type="url" id="inputBackendUrl" placeholder="https://opportunity-radar-backend.onrender.com">
+                <small class="field-hint">When set, all AI Scout & Radar Copilot requests route through your Render service.</small>
+              </div>
+              <div class="notif-action-row">
+                <button type="button" class="btn-primary" id="btnSaveBackendUrl">Save Backend URL</button>
+                <button type="button" class="btn-outline" id="btnTestBackendHealth">⚡ Ping Backend (/health)</button>
+                <button type="button" class="btn-outline-sm" id="btnClearBackendUrl">Use Client-Side</button>
+              </div>
+              <div class="backend-test-status" id="backendTestStatus"></div>
+              <div class="deployment-links-box">
+                <a href="https://vercel.com/new" target="_blank" rel="noopener noreferrer" class="btn-text-sm">▲ Deploy on Vercel ↗</a>
+                <a href="https://dashboard.render.com" target="_blank" rel="noopener noreferrer" class="btn-text-sm">● Deploy on Render ↗</a>
+              </div>
+            </div>
+          </div>
+
           <!-- Gemini AI Configuration Card -->
           <div class="settings-card ai-settings-card">
             <div class="settings-card-header">

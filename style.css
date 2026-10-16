@@ -3844,3 +3844,55 @@ a:hover {
   }
 }
 
+/* ==========================================================================
+   DEPLOYMENT SETTINGS (VERCEL & RENDER)
+   ========================================================================== */
+
+.deployment-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.deploy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.deploy-chip strong {
+  color: var(--purple-accent);
+}
+
+.deploy-chip.connected strong {
+  color: var(--green);
+}
+
+.deploy-chip.offline strong {
+  color: var(--danger);
+}
+
+.backend-test-status {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  min-height: 20px;
+  font-weight: 500;
+}
+
+.deployment-links-box {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+
