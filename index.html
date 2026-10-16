@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opportunity Reminder Agent | College Student Deadline Radar</title>
+  <meta name="description" content="Personal opportunity finder and deadline reminder agent for college students. Track hackathons, Google certifications, internships, scholarships, assignments, and exams.">
+  <meta name="keywords" content="student planner, opportunity tracker, hackathon deadlines, Google certifications, internship alerts, study reminders">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">Opportunity</span>
+            <span class="brand-badge">Agent 2.0</span>
+          </div>
+        </div>
+        <button class="mobile-close-btn" id="mobileSidebarClose" aria-label="Close Sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Timezone Card in Sidebar -->
+      <div class="sidebar-tz-card">
+        <div class="tz-dot pulse"></div>
+        <div class="tz-info">
+          <div class="tz-label">IST Radar Active</div>
+          <div class="tz-clock" id="sidebarLiveClock">--:--:--</div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="dashboard" id="navDashboard">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button class="nav-item" data-view="opportunities" id="navOpportunities">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+          <span>Opportunity Finder</span>
+          <span class="nav-counter" id="navOppCount">0</span>
+        </button>
+
+        <button class="nav-item" data-view="reminders" id="navReminders">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Personal Reminders</span>
+          <span class="nav-counter alert" id="navUrgentCount">0</span>
+        </button>
+
+        <button class="nav-item" data-view="calendar" id="navCalendar">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Deadline Calendar</span>
+          <span class="nav-counter" id="navCalCount">0</span>
+        </button>
+
+        <button class="nav-item" data-view="sources" id="navSources">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span>Trusted Hub</span>
+        </button>
+
+        <button class="nav-item" data-view="ai-scout" id="navAiScout">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>AI Scout (Gemini)</span>
+          <span class="nav-counter ai-chip">Active</span>
+        </button>
+
+        <button class="nav-item" data-view="backup" id="navBackup">
+          <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Backup & Settings</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle-box">
+          <span class="toggle-label">Theme Mode</span>
+          <button class="theme-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode">
+            <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="user-status-card">
+          <div class="user-status-avatar">🎓</div>
+          <div class="user-status-text">
+            <strong>Student Radar</strong>
+            <small id="userStorageStat">Ready & Local</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle navigation menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="page-title-box">
+            <h1 class="page-title" id="pageHeaderTitle">Dashboard</h1>
+            <p class="page-subtitle" id="pageHeaderSubtitle">Real-time student opportunities & deadline radar</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Live Date Display (IST) -->
+          <div class="date-chip" id="headerDateChip" title="Indian Standard Time">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="currentDateDisplay">Loading Date...</span>
+          </div>
+
+          <!-- Notification Bell with Dropdown -->
+          <div class="notif-bell-container">
+            <button class="notif-btn" id="notifBellBtn" aria-label="Open deadline notifications">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+
+            <!-- Notification Drawer Dropdown -->
+            <div class="notif-dropdown" id="notifDropdown">
+              <div class="notif-dropdown-header">
+                <h3>Radar Notifications</h3>
+                <span class="notif-badge-pill" id="notifCountPill">0 alerts</span>
+              </div>
+              <div class="notif-list" id="notifItemsList">
+                <!-- Injected via JS -->
+              </div>
+              <div class="notif-dropdown-footer">
+                <button class="btn-text-sm" id="btnRequestWebNotif">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                  Enable Browser Push
+                </button>
+                <button class="btn-text-sm" id="btnOpenAppsScriptGuide">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  Daily Email Guide
+                </button>
+              </div>
+            </div>
+          <!-- Gemini AI Quick Launch Button -->
+          <button class="btn-ai-header" id="headerAiBtn" title="Launch Gemini AI Assistant">
+            <span class="sparkle-icon">✨</span>
+            <span>Ask AI</span>
+          </button>
+
+          <!-- Quick Action Button -->
+          <div class="quick-add-dropdown">
+            <button class="btn-primary" id="quickAddBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Add Entry</span>
+            </button>
+            <div class="quick-add-menu" id="quickAddMenu">
+              <button class="quick-add-option" id="btnQuickAddOpp">
+                <span class="option-icon">🎯</span>
+                <div>
+                  <strong>Add Opportunity</strong>
+                  <small>Hackathon, certification, internship</small>
+                </div>
+              </button>
+              <button class="quick-add-option" id="btnQuickAddReminder">
+                <span class="option-icon">⏰</span>
+                <div>
+                  <strong>Add Reminder</strong>
+                  <small>Assignment, exam, LeetCode, personal</small>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section class="view-section active" id="view-dashboard">
+        <!-- Motivational Banner -->
+        <div class="welcome-banner">
+          <div class="banner-content">
+            <div class="banner-badge">Student Opportunity Radar 🚀</div>
+            <h2 class="banner-title">Stay Ahead of Opportunities & Deadlines</h2>
+            <p class="banner-desc">
+              Discover official developer challenges, free tech certifications, and scholarships while maintaining zero missed college deadlines.
+            </p>
+            <div class="banner-actions">
+              <button class="btn-banner-primary" id="dashExploreBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Explore Opportunities
+              </button>
+              <button class="btn-banner-secondary" id="dashAddReminderBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Log College Task
+              </button>
+            </div>
+          </div>
+          <div class="banner-stat-pill">
+            <span class="pill-label">Today's Focus</span>
+            <span class="pill-highlight" id="bannerUrgentCount">0 tasks closing soon</span>
+          </div>
+        </div>
+
+        <!-- Metric Cards Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card metric-purple">
+            <div class="metric-header">
+              <span class="metric-title">Total Opportunities</span>
+              <div class="metric-icon">🎯</div>
+            </div>
+            <div class="metric-value" id="statTotalOpp">0</div>
+            <div class="metric-footer">
+              <span id="statSavedOpp">0 saved</span> &bull; <span id="statRegisteredOpp">0 registered</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-orange">
+            <div class="metric-header">
+              <span class="metric-title">Closing Within 7 Days</span>
+              <div class="metric-icon">⚡</div>
+            </div>
+            <div class="metric-value text-orange" id="statClosingSoon">0</div>
+            <div class="metric-footer">
+              <span class="badge-pill-urgent">Urgent Attention</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-coral">
+            <div class="metric-header">
+              <span class="metric-title">Pending Reminders</span>
+              <div class="metric-icon">⏰</div>
+            </div>
+            <div class="metric-value text-coral" id="statPendingReminders">0</div>
+            <div class="metric-footer">
+              <span id="statDueToday">0 due today</span> &bull; <span id="statOverdue" class="text-danger">0 overdue</span>
+            </div>
+          </div>
+
+          <div class="metric-card metric-green">
+            <div class="metric-header">
+              <span class="metric-title">Completed Milestones</span>
+              <div class="metric-icon">✅</div>
+            </div>
+            <div class="metric-value text-green" id="statCompleted">0</div>
+            <div class="metric-footer">
+              <span>Tasks & submissions finished</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Columns Layout for Dashboard -->
+        <div class="dashboard-columns">
+          <!-- Column 1: Opportunities Closing Soon -->
+          <div class="dashboard-card">
+            <div class="card-head">
+              <div class="head-title-wrap">
+                <div class="head-indicator orange"></div>
+                <h3>Opportunities Closing Soon</h3>
+              </div>
+              <button class="btn-link" id="dashViewAllOpp">View All &rarr;</button>
+            </div>
+            <div class="card-body">
+              <div class="radar-list" id="dashClosingSoonList">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Personal Tasks Due & Action Radar -->
+          <div class="dashboard-card">
+            <div class="card-head">
+              <div class="head-title-wrap">
+                <div class="head-indicator purple"></div>
+                <h3>Today's Tasks & Urgent Reminders</h3>
+              </div>
+              <button class="btn-link" id="dashViewAllReminders">View All &rarr;</button>
+            </div>
+            <div class="card-body">
+              <div class="reminder-quick-list" id="dashTodayRemindersList">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trusted Quick Launch Strip -->
+        <div class="quick-source-strip">
+          <div class="strip-header">
+            <h4>Verified Opportunity Launchpad</h4>
+            <span class="strip-sub">Direct access to verified student portals</span>
+          </div>
+          <div class="source-chips-row">
+            <a href="https://unstop.com" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot unstop"></span> Unstop Hackathons ↗
+            </a>
+            <a href="https://devpost.com" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot devpost"></span> Devpost Global ↗
+            </a>
+            <a href="https://www.hackerearth.com" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot hackerearth"></span> HackerEarth Challenges ↗
+            </a>
+            <a href="https://www.cloudskillsboost.google" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot google"></span> Google Cloud Boost ↗
+            </a>
+            <a href="https://developers.google.com/events" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot google"></span> Google for Developers ↗
+            </a>
+            <a href="https://learn.microsoft.com" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot microsoft"></span> Microsoft Learn ↗
+            </a>
+            <a href="https://explore.skillbuilder.aws" target="_blank" rel="noopener noreferrer" class="source-chip">
+              <span class="chip-dot aws"></span> AWS Skill Builder ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: OPPORTUNITY FINDER -->
+      <section class="view-section" id="view-opportunities">
+        <!-- View Header Controls -->
+        <div class="section-toolbar">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="oppSearchInput" placeholder="Search hackathons, Google certs, internships, eligibility..." autocomplete="off">
+            <button class="clear-search-btn" id="oppClearSearch" aria-label="Clear Search">&times;</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <div class="filter-group">
+              <select class="form-select-sm" id="oppCostFilter" aria-label="Filter by Cost">
+                <option value="all">Cost: All</option>
+                <option value="Free">Free Only</option>
+                <option value="Paid">Paid / Voucher</option>
+              </select>
+
+              <select class="form-select-sm" id="oppStatusFilter" aria-label="Filter by Status">
+                <option value="all">Status: All</option>
+                <option value="saved">Saved / Bookmarked</option>
+                <option value="registered">Registered</option>
+                <option value="completed">Completed</option>
+              </select>
+
+              <select class="form-select-sm" id="oppSortSelect" aria-label="Sort Opportunities">
+                <option value="deadline-asc">Deadline: Soonest First</option>
+                <option value="deadline-desc">Deadline: Furthest First</option>
+                <option value="title-asc">Title: A-Z</option>
+                <option value="created-desc">Recently Added</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" id="openAddOppModalBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Add Opportunity</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs" id="oppCategoryTabs">
+          <button class="cat-tab active" data-category="all">
+            <span class="tab-emoji">✨</span> All Categories
+          </button>
+          <button class="cat-tab" data-category="Hackathon">
+            <span class="tab-emoji">⚡</span> Hackathons
+          </button>
+          <button class="cat-tab" data-category="Certification">
+            <span class="tab-emoji">📜</span> Certifications
+          </button>
+          <button class="cat-tab" data-category="Internship">
+            <span class="tab-emoji">💼</span> Internships
+          </button>
+          <button class="cat-tab" data-category="Scholarship">
+            <span class="tab-emoji">🎓</span> Scholarships
+          </button>
+          <button class="cat-tab" data-category="Course">
+            <span class="tab-emoji">📚</span> Free Courses
+          </button>
+          <button class="cat-tab" data-category="Workshop">
+            <span class="tab-emoji">🛠️</span> Workshops
+          </button>
+        </div>
+
+        <!-- Sample Data Notice Banner -->
+        <div class="sample-notice-banner">
+          <div class="notice-icon">💡</div>
+          <div class="notice-text">
+            <strong>Authentic Tracking Standard:</strong> Starter items are marked with <code>[Sample Data]</code> for your reference. You can manually enter genuine opportunities you discover on Unstop, Devpost, Google, or college boards.
+          </div>
+          <button class="btn-outline-sm" id="btnQuickClearSampleOpp">Purge Samples</button>
+        </div>
+
+        <!-- Opportunity Grid -->
+        <div class="cards-grid" id="opportunityGrid">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- Empty State for Opportunities -->
+        <div class="empty-state hidden" id="oppEmptyState">
+          <div class="empty-icon">🔍</div>
+          <h3 class="empty-title">No opportunities found</h3>
+          <p class="empty-desc">No entries match your current search or category filter. Try clearing filters or add a new opportunity manually.</p>
+          <button class="btn-primary" id="btnEmptyAddOpp">+ Log New Opportunity</button>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PERSONAL REMINDER MANAGER -->
+      <section class="view-section" id="view-reminders">
+        <!-- View Header Controls -->
+        <div class="section-toolbar">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="reminderSearchInput" placeholder="Search tasks, college exams, assignments, bills..." autocomplete="off">
+            <button class="clear-search-btn" id="reminderClearSearch" aria-label="Clear Search">&times;</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <div class="filter-group">
+              <select class="form-select-sm" id="reminderCategoryFilter" aria-label="Filter by Category">
+                <option value="all">Category: All</option>
+                <option value="Assignment">Assignments</option>
+                <option value="Exam">Exams</option>
+                <option value="Project">Project Milestones</option>
+                <option value="LeetCode">LeetCode / Coding</option>
+                <option value="Bill">Bills / College Fees</option>
+                <option value="Appointment">Appointments</option>
+                <option value="Personal">Personal & Birthday</option>
+              </select>
+
+              <select class="form-select-sm" id="reminderPriorityFilter" aria-label="Filter by Priority">
+                <option value="all">Priority: All</option>
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+            </div>
+
+            <button class="btn-primary" id="openAddReminderModalBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>+ Add Reminder</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reminder Sub-tabs: Due Today, Upcoming, Overdue, Completed -->
+        <div class="reminder-status-tabs" id="reminderStatusTabs">
+          <button class="status-tab active" data-status="all">
+            All Tasks (<span id="countTabAll">0</span>)
+          </button>
+          <button class="status-tab" data-status="today">
+            Due Today (<span id="countTabToday">0</span>)
+          </button>
+          <button class="status-tab" data-status="upcoming">
+            Upcoming (<span id="countTabUpcoming">0</span>)
+          </button>
+          <button class="status-tab alert-tab" data-status="overdue">
+            Overdue (<span id="countTabOverdue">0</span>)
+          </button>
+          <button class="status-tab" data-status="completed">
+            Completed (<span id="countTabCompleted">0</span>)
+          </button>
+        </div>
+
+        <!-- Reminder List Container -->
+        <div class="reminders-list" id="remindersContainer">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- Empty State for Reminders -->
+        <div class="empty-state hidden" id="reminderEmptyState">
+          <div class="empty-icon">🎉</div>
+          <h3 class="empty-title">All caught up!</h3>
+          <p class="empty-desc">No tasks found under this filter. Enjoy your productive day or log your next college goal.</p>
+          <button class="btn-primary" id="btnEmptyAddReminder">+ Add New Task</button>
+        </div>
+      </section>
+
+      <!-- VIEW: DEADLINE CALENDAR -->
+      <section class="view-section" id="view-calendar">
+        <!-- Calendar Header Controls -->
+        <div class="calendar-header-card">
+          <div class="calendar-nav-controls">
+            <div class="cal-month-nav">
+              <button class="btn-cal-nav" id="btnCalPrev" aria-label="Previous Month">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <h2 class="cal-month-title" id="calCurrentMonthTitle">October 2026</h2>
+              <button class="btn-cal-nav" id="btnCalNext" aria-label="Next Month">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+              <button class="btn-outline-sm btn-cal-today" id="btnCalToday">Today (IST)</button>
+            </div>
+            
+            <div class="cal-filters-row">
+              <label class="cal-filter-pill filter-opp active" id="pillFilterOpp">
+                <input type="checkbox" id="calCheckOpp" checked>
+                <span class="pill-dot purple"></span>
+                <span>Opportunities</span>
+                <span class="cal-pill-count" id="calOppCount">0</span>
+              </label>
+              <label class="cal-filter-pill filter-rem active" id="pillFilterRem">
+                <input type="checkbox" id="calCheckRem" checked>
+                <span class="pill-dot amber"></span>
+                <span>Reminders</span>
+                <span class="cal-pill-count" id="calRemCount">0</span>
+              </label>
+              <label class="cal-filter-pill filter-urgent" id="pillFilterUrgent">
+                <input type="checkbox" id="calCheckUrgent">
+                <span class="pill-dot red"></span>
+                <span>Urgent (&le; 7 Days)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="cal-action-buttons">
+            <button class="btn-outline-sm btn-sync-cal" id="btnExportMonthIcs" title="Export all deadlines shown this month as an .ics calendar file">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Export Month (.ics)</span>
+            </button>
+            <button class="btn-outline-sm btn-sync-cal" id="btnExportAllScheduleIcs" title="Export your entire schedule as .ics file for Google Calendar / Apple Calendar">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span>Export All (.ics)</span>
+            </button>
+            <button class="btn-primary-sm" id="btnCalAddEvent">
+              <span>+ Add Deadline</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Calendar Month Grid Container -->
+        <div class="calendar-wrapper">
+          <div class="calendar-weekdays-row">
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+            <div>Sun</div>
+          </div>
+          <div class="calendar-days-grid" id="calendarDaysGrid">
+            <!-- Populated dynamically via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: TRUSTED RESOURCE HUB -->
+      <section class="view-section" id="view-sources">
+        <div class="section-intro">
+          <h2>Official Trusted Opportunity Portals</h2>
+          <p>
+            Avoid predatory job portals or fake student contests. These verified global and Indian platforms host real hackathons, free learning paths, developer badges, and student benefits.
+          </p>
+        </div>
+
+        <div class="sources-grid">
+          <!-- Unstop -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#FFF3E0; color:#E65100;">Unstop</div>
+              <span class="portal-region">India & Global</span>
+            </div>
+            <h3 class="portal-name">Unstop (Formerly Dare2Compete)</h3>
+            <p class="portal-desc">Premier hub for Indian college hackathons, case competitions, engineering challenges, and off-campus hiring drives with major tech firms.</p>
+            <div class="portal-tags">
+              <span>Hackathons</span>
+              <span>Case Competitions</span>
+              <span>Hiring Challenges</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://unstop.com" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="Unstop Hackathon" data-source-url="https://unstop.com">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Devpost -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#EDE7F6; color:#512DA8;">Devpost</div>
+              <span class="portal-region">Global</span>
+            </div>
+            <h3 class="portal-name">Devpost</h3>
+            <p class="portal-desc">The world's largest online and in-person hackathon platform. Partnered with OpenAI, Google, AWS, Microsoft, and major universities.</p>
+            <div class="portal-tags">
+              <span>AI Hackathons</span>
+              <span>Global Prizes</span>
+              <span>Open Source</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://devpost.com" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="Devpost Hackathon" data-source-url="https://devpost.com">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Google Cloud Skills Boost -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#E8F5E9; color:#1B5E20;">Google Cloud</div>
+              <span class="portal-region">Global</span>
+            </div>
+            <h3 class="portal-name">Google Cloud Skills Boost</h3>
+            <p class="portal-desc">Free monthly learning pathways, hands-on Qwiklabs, and Google Cloud Innovators credentials. Earn verifiable digital skill badges on your resume.</p>
+            <div class="portal-tags">
+              <span>Cloud Badges</span>
+              <span>Free Arcade Labs</span>
+              <span>Certification Prep</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://www.cloudskillsboost.google" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="Google Cloud Skill Badge" data-source-url="https://www.cloudskillsboost.google" data-source-cat="Certification">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Google for Developers -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#E3F2FD; color:#0D47A1;">Google Devs</div>
+              <span class="portal-region">Global & Student Clubs</span>
+            </div>
+            <h3 class="portal-name">Google for Developers & GDSC</h3>
+            <p class="portal-desc">Global Solution Challenge for university students, Android & Web pathways, developer conferences, and Google Developer Student Club community events.</p>
+            <div class="portal-tags">
+              <span>Solution Challenge</span>
+              <span>GDSC Events</span>
+              <span>Mentorship</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://developers.google.com/events" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="Google Solution Challenge" data-source-url="https://developers.google.com/events" data-source-cat="Hackathon">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- Microsoft Learn -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#EDE7F6; color:#4A148C;">Microsoft</div>
+              <span class="portal-region">Global Student Hub</span>
+            </div>
+            <h3 class="portal-name">Microsoft Learn & Student Hub</h3>
+            <p class="portal-desc">Free Azure fundamentals training, Cloud Skills Challenges with 50% to 100% discount vouchers on official certification exams, and GitHub student perks.</p>
+            <div class="portal-tags">
+              <span>Cloud Challenges</span>
+              <span>Exam Vouchers</span>
+              <span>Student Ambassadors</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://learn.microsoft.com" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="Microsoft Cloud Skills Challenge" data-source-url="https://learn.microsoft.com" data-source-cat="Certification">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- AWS Skill Builder -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#FFF8E1; color:#F57F17;">AWS</div>
+              <span class="portal-region">Global</span>
+            </div>
+            <h3 class="portal-name">AWS Skill Builder</h3>
+            <p class="portal-desc">Over 600+ free digital courses curated by AWS experts, including AWS Cloud Practitioner Essentials, AWS Cloud Quest game-based learning, and ramp-up guides.</p>
+            <div class="portal-tags">
+              <span>Cloud Quest</span>
+              <span>Free AWS Courses</span>
+              <span>Role Guides</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://explore.skillbuilder.aws" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="AWS Skill Builder Path" data-source-url="https://explore.skillbuilder.aws" data-source-cat="Course">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+
+          <!-- HackerEarth -->
+          <div class="source-portal-card">
+            <div class="portal-head">
+              <div class="portal-badge" style="background:#E0F2F1; color:#004D40;">HackerEarth</div>
+              <span class="portal-region">Global & India</span>
+            </div>
+            <h3 class="portal-name">HackerEarth Challenges</h3>
+            <p class="portal-desc">Competitive programming sprints, enterprise hackathons, and algorithm sprint contests with direct internship and job interview shortlists.</p>
+            <div class="portal-tags">
+              <span>Algorithm Contests</span>
+              <span>Hiring Sprints</span>
+              <span>Practice Arena</span>
+            </div>
+            <div class="portal-actions">
+              <a href="https://www.hackerearth.com" target="_blank" rel="noopener noreferrer" class="btn-portal-open">
+                Visit Official Portal ↗
+              </a>
+              <button class="btn-portal-add" data-source-name="HackerEarth Sprint" data-source-url="https://www.hackerearth.com" data-source-cat="Hackathon">
+                + Log Entry
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: BACKUP & SETTINGS -->
+      <section class="view-section" id="view-backup">
+        <div class="section-intro">
+          <h2>Data Management & Background Sync</h2>
+          <p>
+            Your data is stored securely in your browser's <code>localStorage</code>. No remote server or paid database is required. Back up your opportunities or set up automated email notifications.
+          </p>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Backup Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon purple">📦</div>
+              <div>
+                <h3>Export & Backup Records</h3>
+                <p>Download a timestamped JSON file containing all your opportunities, personal reminders, and custom tags.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="data-stats-bar">
+                <div><strong id="backupOppCount">0</strong> Opportunities</div>
+                <div><strong id="backupReminderCount">0</strong> Reminders</div>
+                <div><strong id="backupStorageSize">0 KB</strong> Storage Used</div>
+              </div>
+              <button class="btn-primary" id="btnExportJSON">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Export JSON Backup
+              </button>
+            </div>
+          </div>
+
+          <!-- Restore Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon green">📥</div>
+              <div>
+                <h3>Import & Restore Records</h3>
+                <p>Upload a previously exported JSON backup to recover your entries or sync across laptops.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="file-upload-box">
+                <input type="file" id="importFileInput" accept=".json" class="file-input-hidden">
+                <label for="importFileInput" class="file-drop-label">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Select JSON File to Restore</span>
+                </label>
+              </div>
+              <div class="import-options">
+                <label class="radio-label">
+                  <input type="radio" name="importMode" value="merge" checked>
+                  <span>Merge with existing records</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="importMode" value="replace">
+                  <span>Replace existing records</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification Strategy Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon orange">🔔</div>
+              <div>
+                <h3>Notification System Controls</h3>
+                <p>Configure local browser alerts and understand reliable delivery constraints.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="notif-status-badge-box">
+                <span>Current Browser Permission:</span>
+                <span class="badge-status" id="browserNotifStatus">Default</span>
+              </div>
+              <p class="settings-help-text">
+                <strong>Important Notice:</strong> Browser Web Notifications only trigger when the website is open or in an active tab. They are not a true background daemon if your computer is asleep or the browser is shut down.
+              </p>
+              <div class="notif-action-row">
+                <button class="btn-outline" id="btnRequestNotifPermission">Request Browser Notification</button>
+                <button class="btn-outline" id="btnTriggerTestNotif">Send Test Alert</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google Apps Script Automation Card -->
+          <div class="settings-card highlight-card">
+            <div class="settings-card-header">
+              <div class="settings-icon green">⚡</div>
+              <div>
+                <h3>Automated Gmail Reminders (Google Apps Script)</h3>
+                <p>Run a 100% free cloud cron job in Google Apps Script that triggers an email summary every morning at 7:30 AM IST.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <p class="settings-help-text">
+                Since vanilla browser scripts cannot send emails while your laptop is closed, we provide a ready-to-paste Google Apps Script integration that runs completely free on Google's cloud servers!
+              </p>
+              <button class="btn-primary" id="btnViewAppsScriptModal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                View Apps Script Setup Guide & Code
+              </button>
+            </div>
+          </div>
+
+          <!-- Calendar Synchronization Card -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon purple">📅</div>
+              <div>
+                <h3>Calendar Integration & .ics Export</h3>
+                <p>Sync all opportunity deadlines and exam dates with Google Calendar, Apple Calendar, or Microsoft Outlook.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <p class="settings-help-text">
+                Exporting your schedule as an <code>.ics</code> (iCalendar) file includes automatic 24-hour and 2-hour pre-deadline notifications that fire natively on your phone and computer.
+              </p>
+              <div class="notif-action-row">
+                <button class="btn-primary" id="btnExportAllIcsSettings">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Export All Deadlines (.ics)
+                </button>
+                <a href="https://calendar.google.com" target="_blank" rel="noopener noreferrer" class="btn-outline">
+                  Open Google Calendar ↗
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gemini AI Configuration Card -->
+          <div class="settings-card ai-settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon purple">✨</div>
+              <div>
+                <h3>Gemini AI API Configuration</h3>
+                <p>Manage the Google Gemini API key powering smart opportunity parsing, study planning, and recommendations.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="api-key-display-box">
+                <span class="api-label">Active Key:</span>
+                <code class="api-key-code" id="settingsMaskedKey">Loading...</code>
+                <button type="button" class="btn-text-sm" id="btnToggleKeyVisibility">Reveal</button>
+              </div>
+              <div class="form-group" style="margin-top: 6px;">
+                <label for="inputCustomApiKey">Update / Custom API Key</label>
+                <input type="password" id="inputCustomApiKey" placeholder="Paste your Gemini API key here">
+              </div>
+              <div class="notif-action-row">
+                <button type="button" class="btn-primary" id="btnSaveCustomKey">Save Key</button>
+                <button type="button" class="btn-outline" id="btnTestApiConnection">⚡ Test Connection</button>
+                <button type="button" class="btn-outline-sm" id="btnResetToDefaultKey">Reset to Default</button>
+              </div>
+              <div class="api-test-status" id="apiTestStatus"></div>
+              <p class="settings-help-text" style="font-size: 0.74rem;">
+                <strong>Security:</strong> Key is stored locally in <code>config.js</code> / <code>localStorage</code>. Requests are sent directly to Google's official Gemini endpoint.
+              </p>
+            </div>
+          </div>
+
+          <!-- Danger Zone Card -->
+          <div class="settings-card danger-card">
+            <div class="settings-card-header">
+              <div class="settings-icon danger">⚠️</div>
+              <div>
+                <h3>Data Maintenance & Clean Up</h3>
+                <p>Clean sample test data or start fresh without touching your authentic user entries.</p>
+              </div>
+            </div>
+            <div class="settings-body">
+              <div class="danger-actions-row">
+                <button class="btn-outline-danger" id="btnClearOnlySampleData">
+                  Clear Sample Records Only
+                </button>
+                <button class="btn-danger" id="btnResetAllData">
+                  Reset Everything to Defaults
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: AI SCOUT (GEMINI POWERED) -->
+      <section class="view-section" id="view-ai-scout">
+        <div class="ai-banner">
+          <div class="ai-banner-header">
+            <div class="ai-badge-live">
+              <span class="ai-dot pulse"></span>
+              <span>Gemini AI Connected</span>
+            </div>
+            <span class="ai-key-pill" id="aiKeyStatusPill">Active Key Configured</span>
+          </div>
+          <h2 class="ai-title">Gemini AI Opportunity Scout & Assistant</h2>
+          <p class="ai-sub">
+            Powered by your active Gemini API key. Parse unstructured hackathon messages, get tailored tech recommendations, or break down exams into milestone checklists.
+          </p>
+        </div>
+
+        <div class="ai-tabs-container" id="aiModeTabs">
+          <button class="ai-mode-tab active" data-mode="extract">
+            <span class="tab-icon">📋</span> Smart Announcement Parser
+          </button>
+          <button class="ai-mode-tab" data-mode="recommend">
+            <span class="tab-icon">🎯</span> Tailored Program Recommender
+          </button>
+          <button class="ai-mode-tab" data-mode="study">
+            <span class="tab-icon">📚</span> Exam & Task Breakdown
+          </button>
+        </div>
+
+        <!-- Mode 1: Announcement Parser -->
+        <div class="ai-panel active" id="aiPanelExtract">
+          <div class="ai-card">
+            <h3>Extract Opportunity from Unstructured Text</h3>
+            <p class="ai-help">
+              Paste any forwarded WhatsApp announcement, poster text, or email circular. Gemini will extract title, deadline, eligibility, cost, and official link into a ready-to-save card.
+            </p>
+            <div class="ai-input-group">
+              <textarea id="aiExtractInput" rows="5" placeholder="Example:
+Hey everyone! Registrations for Smart India Hackathon (SIH 2026) are now live! Teams of 6 can register by 28th October 2026. Entry is completely free. Official link: https://sih.gov.in. Themes include Smart Automation, HealthTech, and AI."></textarea>
+            </div>
+            <div class="ai-action-bar">
+              <button class="btn-primary" id="btnRunAiExtract">
+                <span>✨ Extract with Gemini AI</span>
+              </button>
+              <button class="btn-outline-sm" id="btnSampleText">Insert Sample Announcement</button>
+            </div>
+
+            <!-- Result Box -->
+            <div class="ai-result-box hidden" id="aiExtractResult">
+              <div class="ai-result-header">
+                <h4>Extracted Opportunity Preview</h4>
+                <span class="badge-pill-urgent">Ready to Save</span>
+              </div>
+              <div class="extracted-fields-grid" id="aiExtractedFields">
+                <!-- Injected via JS -->
+              </div>
+              <div class="ai-result-actions">
+                <button class="btn-primary" id="btnAddExtractedToRadar">
+                  + Add Directly to Opportunity Radar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: Tailored Recommendations -->
+        <div class="ai-panel" id="aiPanelRecommend">
+          <div class="ai-card">
+            <h3>Discover Opportunities Tailored to Your Profile</h3>
+            <p class="ai-help">
+              Tell Gemini your major and target interests to discover top certifications, open-source challenges, and hackathons.
+            </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="aiStudentYear">Your Year</label>
+                <select id="aiStudentYear">
+                  <option value="1st Year Undergrad">1st Year Undergrad (Freshman)</option>
+                  <option value="2nd Year Undergrad" selected>2nd Year Undergrad (Sophomore)</option>
+                  <option value="3rd Year Undergrad">3rd Year Undergrad (Pre-final)</option>
+                  <option value="4th Year Undergrad">4th Year Undergrad (Final Year)</option>
+                  <option value="Postgraduate / Masters">Postgraduate / Masters</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="aiStudentDomain">Domain & Focus Area</label>
+                <input type="text" id="aiStudentDomain" placeholder="e.g. AI / Machine Learning, Cloud & DevOps, Full-Stack Web" value="Full-Stack Web & AI">
+              </div>
+            </div>
+            <button class="btn-primary" id="btnRunAiRecommend">
+              <span>✨ Ask Gemini for Top Opportunities</span>
+            </button>
+
+            <!-- Recommendation Result -->
+            <div class="ai-result-box hidden" id="aiRecommendResult">
+              <div class="ai-markdown-output" id="aiRecommendContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 3: Exam & Task Breakdown -->
+        <div class="ai-panel" id="aiPanelStudy">
+          <div class="ai-card">
+            <h3>Break Down Complex Exams or Projects into Milestones</h3>
+            <p class="ai-help">
+              Enter an exam or project name and target deadline. Gemini AI will generate structured preparation steps and convert them into personal reminders.
+            </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="aiGoalTitle">Goal / Exam Name</label>
+                <input type="text" id="aiGoalTitle" placeholder="e.g. Operating Systems Semester Exam or Hackathon MVP Demo">
+              </div>
+              <div class="form-group">
+                <label for="aiGoalDate">Target Deadline</label>
+                <input type="date" id="aiGoalDate">
+              </div>
+            </div>
+            <button class="btn-primary" id="btnRunAiBreakdown">
+              <span>✨ Generate Milestone Checklist</span>
+            </button>
+
+            <!-- Breakdown Result -->
+            <div class="ai-result-box hidden" id="aiBreakdownResult">
+              <div class="ai-breakdown-list" id="aiBreakdownList"></div>
+              <div class="ai-result-actions">
+                <button class="btn-primary" id="btnAddMilestonesToReminders">
+                  + Add Milestones to Personal Reminders
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD / EDIT OPPORTUNITY -->
+  <div class="modal-overlay hidden" id="modalOpportunity">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalOppTitle">
+      <div class="modal-header">
+        <h3 id="modalOppTitle">Log Opportunity</h3>
+        <button class="modal-close-btn" id="closeOppModalBtn" aria-label="Close Modal">&times;</button>
+      </div>
+      <form id="formOpportunity" novalidate>
+        <input type="hidden" id="oppId">
+
+        <div class="form-group">
+          <label for="oppTitleInput">Opportunity Title <span class="required">*</span></label>
+          <input type="text" id="oppTitleInput" placeholder="e.g. Google Cloud Arcade Challenge 2026 or Smart India Hackathon" required>
+          <span class="field-error" id="errorOppTitle"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="oppCategoryInput">Category <span class="required">*</span></label>
+            <select id="oppCategoryInput" required>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Certification">Certification</option>
+              <option value="Internship">Internship</option>
+              <option value="Scholarship">Scholarship</option>
+              <option value="Course">Free Course</option>
+              <option value="Workshop">Workshop</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="oppCostInput">Cost / Fee <span class="required">*</span></label>
+            <select id="oppCostInput" required>
+              <option value="Free">100% Free</option>
+              <option value="Paid">Paid / Examination Fee</option>
+              <option value="Voucher/Discount">Voucher / Financial Aid Available</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="oppDeadlineInput">Deadline Date <span class="required">*</span></label>
+            <input type="date" id="oppDeadlineInput" required>
+            <span class="field-error" id="errorOppDeadline"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="oppStatusSelect">Registration Status</label>
+            <select id="oppStatusSelect">
+              <option value="Interested">Interested / Bookmarked</option>
+              <option value="Registered">Registered / Applied</option>
+              <option value="Completed">Completed / Submitted</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="oppUrlInput">Official Portal URL <span class="required">*</span></label>
+          <input type="url" id="oppUrlInput" placeholder="https://unstop.com/... or https://cloudskillsboost.google/..." required>
+          <span class="field-error" id="errorOppUrl"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="oppEligibilityInput">Eligibility Criteria</label>
+          <input type="text" id="oppEligibilityInput" placeholder="e.g. Any 1st-4th year B.Tech, Open to all college students, Teams of 2-4">
+        </div>
+
+        <div class="form-group">
+          <label for="oppNotesInput">Notes, Tracks & Preparation Tips</label>
+          <textarea id="oppNotesInput" rows="3" placeholder="e.g. Project idea ready in Next.js, submission needs 2-min demo video, mentor review on Friday."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" id="cancelOppModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="saveOppBtn">Save Opportunity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT REMINDER -->
+  <div class="modal-overlay hidden" id="modalReminder">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalReminderTitle">
+      <div class="modal-header">
+        <h3 id="modalReminderTitle">Add Personal Reminder</h3>
+        <button class="modal-close-btn" id="closeReminderModalBtn" aria-label="Close Modal">&times;</button>
+      </div>
+      <form id="formReminder" novalidate>
+        <input type="hidden" id="reminderId">
+
+        <div class="form-group">
+          <label for="reminderTitleInput">Task / Milestone Name <span class="required">*</span></label>
+          <input type="text" id="reminderTitleInput" placeholder="e.g. OS Midterm Exam, Submit DBMS Lab Report, Solve 3 LeetCode DP Problems" required>
+          <span class="field-error" id="errorReminderTitle"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reminderCategoryInput">Category <span class="required">*</span></label>
+            <select id="reminderCategoryInput" required>
+              <option value="Assignment">College Assignment</option>
+              <option value="Exam">Semester / Midterm Exam</option>
+              <option value="Project">Project Milestone</option>
+              <option value="LeetCode">LeetCode / Coding Streak</option>
+              <option value="Bill">Bill / College Fees</option>
+              <option value="Appointment">Appointment / Interview</option>
+              <option value="Personal">Personal & Birthday</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="reminderPriorityInput">Priority Level <span class="required">*</span></label>
+            <select id="reminderPriorityInput" required>
+              <option value="High">High (Urgent)</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reminderDateInput">Due Date <span class="required">*</span></label>
+            <input type="date" id="reminderDateInput" required>
+            <span class="field-error" id="errorReminderDate"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="reminderTimeInput">Due Time</label>
+            <input type="time" id="reminderTimeInput" value="23:59">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reminderDescInput">Description / Checklist</label>
+          <textarea id="reminderDescInput" rows="3" placeholder="e.g. Bring scientific calculator and hall ticket. Review chapter 4 & 5."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" id="cancelReminderModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="saveReminderBtn">Save Reminder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GOOGLE APPS SCRIPT AUTOMATION GUIDE -->
+  <div class="modal-overlay hidden" id="modalAppsScript">
+    <div class="modal-box modal-lg" role="dialog" aria-modal="true" aria-labelledby="appsScriptModalTitle">
+      <div class="modal-header">
+        <h3 id="appsScriptModalTitle">Free Daily Gmail Automation Guide (Google Apps Script)</h3>
+        <button class="modal-close-btn" id="closeAppsScriptModalBtn" aria-label="Close Modal">&times;</button>
+      </div>
+      <div class="modal-scroll-body">
+        <div class="guide-banner">
+          <p>
+            <strong>Why this works:</strong> Regular browser notifications require your browser tab to be awake. By utilizing Google Apps Script (a free Google service included with every Gmail account), you can receive automated daily morning briefing emails at 7:30 AM IST with zero paid servers or API keys!
+          </p>
+        </div>
+
+        <h4 class="guide-step-title">Step 1: Open Google Apps Script</h4>
+        <p class="guide-text">Navigate to <a href="https://script.google.com" target="_blank" rel="noopener noreferrer">script.google.com</a> and click on <strong>New Project</strong>.</p>
+
+        <h4 class="guide-step-title">Step 2: Copy and Paste the Script</h4>
+        <p class="guide-text">Replace any placeholder code in <code>Code.gs</code> with the snippet below:</p>
+
+        <div class="code-snippet-box">
+          <pre><code id="appsScriptCodeBlock">function sendDailyOpportunityBriefing() {
+  var recipientEmail = Session.getActiveUser().getEmail();
+  var today = new Date();
+  
+  // Format Date for India Standard Time
+  var formattedDate = Utilities.formatDate(today, "Asia/Kolkata", "EEEE, dd MMMM yyyy");
+  
+  var emailSubject = "🎓 Daily Opportunity & Deadline Radar - " + formattedDate;
+  
+  // HTML Email Body
+  var htmlBody = "&lt;div style='font-family:sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #E5E0D5; border-radius:12px; background:#FDFBF7;'&gt;"
+    + "&lt;div style='background:#635BFF; color:#fff; padding:16px; border-radius:8px; text-align:center;'&gt;"
+    + "&lt;h2 style='margin:0;'&gt;Daily Student Deadline Radar&lt;/h2&gt;"
+    + "&lt;p style='margin:4px 0 0;'&gt;" + formattedDate + " (IST)&lt;/p&gt;"
+    + "&lt;/div&gt;"
+    + "&lt;div style='padding:16px 0;'&gt;"
+    + "&lt;p&gt;Good morning! Here is your daily reminder to check your upcoming college submissions, Google certification tracks, and hackathon registrations.&lt;/p&gt;"
+    + "&lt;div style='background:#FEF3C7; border-left:4px solid #F59E0B; padding:12px; margin:14px 0; border-radius:4px;'&gt;"
+    + "&lt;strong style='color:#B45309;'&gt;⚡ Action Step for Today:&lt;/strong&gt;&lt;br&gt;"
+    + "Open your local &lt;strong&gt;Opportunity Reminder Agent&lt;/strong&gt; to review deadlines closing within 7 days.&lt;/div&gt;"
+    + "&lt;p style='font-size:13px; color:#6B7280;'&gt;Sent automatically via Google Apps Script Time-driven trigger.&lt;/p&gt;"
+    + "&lt;/div&gt;&lt;/div&gt;";
+    
+  MailApp.sendEmail({
+    to: recipientEmail,
+    subject: emailSubject,
+    htmlBody: htmlBody
+  });
+  
+  Logger.log("Briefing successfully dispatched to " + recipientEmail);
+}</code></pre>
+          <button class="btn-copy-code" id="btnCopyScriptCode">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy Script
+          </button>
+        </div>
+
+        <h4 class="guide-step-title">Step 3: Test and Authorize</h4>
+        <p class="guide-text">Click the <strong>Run</strong> button at the top toolbar. Google will ask for permission to send emails from your own account to yourself. Grant authorization and verify that an email arrives in your Gmail inbox.</p>
+
+        <h4 class="guide-step-title">Step 4: Set the Daily 7:30 AM Trigger</h4>
+        <ol class="guide-steps-list">
+          <li>Click the <strong>Clock icon (Triggers)</strong> on the left panel.</li>
+          <li>Click <strong>+ Add Trigger</strong> (bottom right).</li>
+          <li>Select <em>Event source</em>: <strong>Time-driven</strong>.</li>
+          <li>Select <em>Type of time based trigger</em>: <strong>Day timer</strong>.</li>
+          <li>Select <em>Time of day</em>: <strong>7am to 8am</strong>.</li>
+          <li>Click <strong>Save</strong>. You now have an automated daily reminder service!</li>
+        </ol>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" id="btnCloseAppsScriptModal">Got it, thanks!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DAY EVENTS DETAIL & CALENDAR SYNC -->
+  <div class="modal-overlay hidden" id="modalDayEvents">
+    <div class="modal-box modal-lg" role="dialog" aria-modal="true" aria-labelledby="modalDayEventsTitle">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalDayEventsTitle">Deadlines for Date</h3>
+          <p class="modal-subtitle" id="modalDayEventsSubtitle">0 items scheduled</p>
+        </div>
+        <button class="modal-close-btn" id="closeDayEventsModalBtn" aria-label="Close Modal">&times;</button>
+      </div>
+      <div class="modal-scroll-body">
+        <div class="day-events-list" id="dayEventsList">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+      <div class="modal-footer modal-footer-split">
+        <div class="modal-footer-left">
+          <button type="button" class="btn-outline-sm" id="btnDayAddOpp">+ Add Opportunity</button>
+          <button type="button" class="btn-outline-sm" id="btnDayAddRem">+ Add Reminder</button>
+        </div>
+        <button type="button" class="btn-primary" id="btnCloseDayModal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
