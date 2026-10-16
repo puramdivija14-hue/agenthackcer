@@ -71,7 +71,16 @@ The application implements a custom curated palette engineered for readability, 
 - **Exam & Milestone Generator:** Enter an exam or project and Gemini generates a step-by-step checklist of prep milestones with due dates that you can add directly to your Personal Reminders!
 - **API Key Management:** View, test, or update your API key in **Backup & Settings** with live latency testing.
 
-### 7. Data Privacy & Backup
+### 7. Radar Copilot Interactive AI Chatbot 🤖💬
+- **Global Floating Widget:** Accessible across all views (Dashboard, Opportunities, Reminders, Calendar, Settings) via the floating launcher button in the bottom-right corner.
+- **Context-Aware Intelligence:** Automatically feeds your live IST date/time, closing-soon opportunities, and pending deadlines into conversations (e.g., *"What is closing soon?"*, *"What are my pending tasks?"*).
+- **Agentic Action Execution:** Instruct the Copilot in plain natural language (e.g., *"Add reminder: OS Lab submission due Friday"* or *"Track hackathon: Smart India Hackathon due 2026-11-15"*). The Copilot generates executable action blocks that automatically create new reminders or opportunities, syncs to `localStorage`, and refreshes the UI in real time.
+- **Voice Dictation (Web Speech API):** Click the microphone icon to dictate questions or new reminders hands-free with speech-to-text.
+- **Quick Suggestion Chips:** One-tap starter prompts for instant schedule checks, study milestone roadmaps, and opportunity tracking.
+- **Conversation Memory & Persistence:** Remembers chat history across tabs and refreshes using local storage with a one-click "Clear History" button.
+- **Smart Fallback Engine:** Features built-in heuristic pattern matching to answer common schedule questions and execute actions even when working offline or before configuring an API key.
+
+### 8. Data Privacy & Backup
 - **100% Client-Side:** Everything is stored in your browser's `localStorage`.
 - **JSON Export:** Download a `.json` backup file with all your opportunities and reminders.
 - **JSON Import:** Restore backup files with your choice of **Merge** (non-destructive) or **Replace** mode.

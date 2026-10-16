@@ -3056,7 +3056,423 @@ Output strictly valid JSON array without markdown fences:
   }
 
   // ==========================================================================
-  // 16. BOOTSTRAP APPLICATION
+  // 18. FLOATING RADAR COPILOT CHATBOT CONTROLLER
+  // ==========================================================================
+  function initRadarCopilotChatbot() {
+    const fabBtn = document.getElementById('chatbotFabBtn');
+    const chatWindow = document.getElementById('chatbotWindow');
+    const closeBtn = document.getElementById('btnCloseChatWindow');
+    const clearBtn = document.getElementById('btnClearChatHistory');
+    const messagesContainer = document.getElementById('chatMessagesContainer');
+    const typingIndicator = document.getElementById('chatTypingIndicator');
+    const inputForm = document.getElementById('chatInputForm');
+    const inputText = document.getElementById('chatInputText');
+    const sendBtn = document.getElementById('btnChatSend');
+    const micBtn = document.getElementById('btnChatMic');
+    const suggestionsBox = document.getElementById('chatSuggestionsBox');
+    const headerAiBtn = document.getElementById('headerAiBtn');
+
+    if (!fabBtn || !chatWindow) return;
+
+    const STORAGE_KEY_CHAT = 'opportunity_agent_copilot_history_v1';
+    let chatHistory = [];
+
+    // Load stored messages
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_CHAT);
+      if (stored) {
+        chatHistory = JSON.parse(stored);
+      }
+    } catch (e) {
+      chatHistory = [];
+    }
+
+    if (!Array.isArray(chatHistory) || chatHistory.length === 0) {
+      chatHistory = [
+        {
+          sender: 'bot',
+          text: `👋 **Hi there! I'm Radar Copilot, your student AI assistant.**\n\nI'm connected in real-time to your deadlines, exams, and opportunities. You can ask me:\n• *"What do I need to submit this week?"*\n• *"Add an exam: DBMS Midterm on Oct 25 at 10:00 AM"*\n• *"Find 3 free cloud certification challenges"*\n• *"Draft a cold outreach email for project mentorship"*\n\nHow can I help you today?`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ];
+    }
+
+    function saveChatHistory() {
+      try {
+        if (chatHistory.length > 40) {
+          chatHistory = chatHistory.slice(-40);
+        }
+        localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(chatHistory));
+      } catch (e) {
+        console.warn('Failed to save chat history:', e);
+      }
+    }
+
+    function formatChatMarkdown(text) {
+      if (!text) return '';
+      let clean = escapeHTML(text);
+      clean = clean.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      clean = clean.replace(/`([^`]+)`/g, '<code>$1</code>');
+      clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      clean = clean.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      clean = clean.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>');
+      clean = clean.replace(/\n- (.*?)(?=\n|$)/g, '<br>&bull; $1');
+      clean = clean.replace(/\n• (.*?)(?=\n|$)/g, '<br>&bull; $1');
+      clean = clean.replace(/\n/g, '<br>');
+      return clean;
+    }
+
+    function renderChatMessages() {
+      if (!messagesContainer) return;
+      messagesContainer.innerHTML = '';
+
+      chatHistory.forEach(msg => {
+        const msgEl = document.createElement('div');
+        msgEl.className = `chat-msg ${msg.sender}`;
+
+        let avatarHtml = '';
+        if (msg.sender === 'bot') {
+          avatarHtml = '<div class="chat-msg-avatar">🤖</div>';
+        } else {
+          avatarHtml = '<div class="chat-msg-avatar">🎓</div>';
+        }
+
+        let actionCardHtml = '';
+        if (msg.actionExecuted) {
+          actionCardHtml = `
+            <div class="chat-action-card">
+              <span class="chat-action-icon">✓</span>
+              <span><strong>Action Completed:</strong> ${escapeHTML(msg.actionExecuted)}</span>
+            </div>
+          `;
+        }
+
+        msgEl.innerHTML = `
+          ${avatarHtml}
+          <div class="chat-msg-content-wrap">
+            <div class="chat-msg-bubble">
+              ${formatChatMarkdown(msg.text)}
+              ${actionCardHtml}
+            </div>
+            <div class="chat-msg-time">${escapeHTML(msg.time || '')}</div>
+          </div>
+        `;
+
+        messagesContainer.appendChild(msgEl);
+      });
+
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function toggleChatWindow(forceState) {
+      const isHidden = chatWindow.classList.contains('hidden');
+      const shouldOpen = (typeof forceState === 'boolean') ? forceState : isHidden;
+
+      if (shouldOpen) {
+        chatWindow.classList.remove('hidden');
+        renderChatMessages();
+        setTimeout(() => inputText && inputText.focus(), 150);
+      } else {
+        chatWindow.classList.add('hidden');
+      }
+    }
+
+    fabBtn.addEventListener('click', () => toggleChatWindow());
+    closeBtn.addEventListener('click', () => toggleChatWindow(false));
+
+    if (headerAiBtn) {
+      headerAiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleChatWindow(true);
+      });
+    }
+
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Clear Copilot chat conversation history?')) {
+        chatHistory = [
+          {
+            sender: 'bot',
+            text: `Conversation cleared. 🧹 What would you like to plan or explore next?`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ];
+        saveChatHistory();
+        renderChatMessages();
+        showToast('Chat Cleared', 'Conversation history reset.', 'info');
+      }
+    });
+
+    inputText.addEventListener('input', () => {
+      inputText.style.height = 'auto';
+      inputText.style.height = Math.min(inputText.scrollHeight, 90) + 'px';
+    });
+
+    inputText.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        inputForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    if (suggestionsBox) {
+      suggestionsBox.querySelectorAll('.suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const prompt = chip.getAttribute('data-prompt');
+          if (prompt) {
+            handleSendMessage(prompt);
+          }
+        });
+      });
+    }
+
+    // Voice recognition (Web Speech API)
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRec && micBtn) {
+      const recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        micBtn.classList.add('listening');
+        showToast('Listening...', 'Speak your query or task.', 'info');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript && inputText) {
+          inputText.value = transcript;
+          inputText.style.height = 'auto';
+          inputText.style.height = Math.min(inputText.scrollHeight, 90) + 'px';
+        }
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove('listening');
+        showToast('Voice Input', 'Audio capture cancelled or unavailable.', 'warning');
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove('listening');
+      };
+
+      micBtn.addEventListener('click', () => {
+        try {
+          if (micBtn.classList.contains('listening')) {
+            recognition.stop();
+          } else {
+            recognition.start();
+          }
+        } catch (e) {
+          console.warn('Speech recognition error:', e);
+        }
+      });
+    } else if (micBtn) {
+      micBtn.style.display = 'none';
+    }
+
+    function buildCopilotSystemPrompt(userText) {
+      const todayIST = getTodayIST();
+      
+      const urgentOpps = state.opportunities.filter(o => {
+        if (o.status === 'Completed') return false;
+        const c = calculateDaysRemaining(o.deadline);
+        return c.diffDays >= 0 && c.diffDays <= 7;
+      }).map(o => `"${o.title}" (${o.category}, deadline: ${o.deadline})`).join(', ') || 'None';
+
+      const pendingReminders = state.reminders.filter(r => !r.completed)
+        .map(r => `"${r.title}" (Category: ${r.category}, Due: ${r.dueDate}, Priority: ${r.priority})`).join(', ') || 'None';
+
+      return `You are Radar Copilot, an intelligent, encouraging personal academic & opportunity assistant built for college students inside the Opportunity Reminder Agent.
+Current Date (Indian Standard Time): ${todayIST}.
+Active Opportunities Closing Soon (within 7 days): ${urgentOpps}.
+Active Pending Student Reminders/Deadlines: ${pendingReminders}.
+
+Instructions:
+1. Answer concisely, practically, and empathetically with clear markdown formatting (bullet points, bold text).
+2. If the user asks about their schedule or deadlines, answer using the exact active opportunities and pending reminders provided above!
+3. If the user asks to add, schedule, or log an assignment, exam, task, or hackathon:
+   - Provide a warm confirmation.
+   - At the VERY END of your reply, output a single command wrapped in <<<ACTION_COMMAND: ... >>>:
+     For a reminder / academic task:
+     <<<ACTION_COMMAND: {"action":"add_reminder","title":"Task Title","category":"Assignment|Exam|Project|LeetCode|Bill|Appointment|Personal","priority":"High|Medium|Low","dueDate":"YYYY-MM-DD","dueTime":"HH:MM","description":"brief details"}>>>
+     For a hackathon / certification / course:
+     <<<ACTION_COMMAND: {"action":"add_opportunity","title":"Opportunity Title","category":"Hackathon|Certification|Internship|Scholarship|Course|Workshop","cost":"Free|Paid","deadline":"YYYY-MM-DD","url":"https://...","eligibility":"...","notes":"..."}>>>
+   (Ensure dueDate/deadline is a valid YYYY-MM-DD date based on today: ${todayIST}).
+4. If the user asks for guidance (e.g. hackathon prep, resume tips, exam schedule), give actionable, high-yield advice.
+
+Student query:
+"${userText}"`;
+    }
+
+    async function handleSendMessage(customText) {
+      const text = (typeof customText === 'string') ? customText.trim() : (inputText.value || '').trim();
+      if (!text) return;
+
+      inputText.value = '';
+      inputText.style.height = 'auto';
+
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      chatHistory.push({
+        sender: 'user',
+        text: text,
+        time: nowTime
+      });
+
+      saveChatHistory();
+      renderChatMessages();
+
+      typingIndicator.classList.remove('hidden');
+      sendBtn.disabled = true;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      try {
+        const prompt = buildCopilotSystemPrompt(text);
+        let aiRawResponse = '';
+
+        try {
+          aiRawResponse = await callGeminiAPI(prompt);
+        } catch (apiErr) {
+          console.warn('Chatbot Gemini API call failed, using intelligent local response:', apiErr);
+          aiRawResponse = generateLocalFallbackResponse(text);
+        }
+
+        let actionExecutedLabel = null;
+        const actionMatch = aiRawResponse.match(/<<<ACTION_COMMAND:\s*(\{[\s\S]*?\})\s*>>>/);
+
+        if (actionMatch && actionMatch[1]) {
+          try {
+            const cmd = JSON.parse(actionMatch[1]);
+            if (cmd.action === 'add_reminder') {
+              const newRem = {
+                id: `rem_chat_${Date.now()}`,
+                title: cmd.title || 'Task from Copilot',
+                category: cmd.category || 'Assignment',
+                priority: cmd.priority || 'Medium',
+                dueDate: cmd.dueDate || getRelativeDateStr(2),
+                dueTime: cmd.dueTime || '23:59',
+                description: cmd.description || 'Added via Radar Copilot',
+                completed: false,
+                isSample: false,
+                createdAt: new Date().toISOString()
+              };
+              state.reminders.unshift(newRem);
+              saveReminders();
+              renderAll();
+              actionExecutedLabel = `Added "${newRem.title}" to Reminders (Due: ${newRem.dueDate})`;
+              showToast('Task Added via Copilot', newRem.title, 'success');
+            } else if (cmd.action === 'add_opportunity') {
+              const newOpp = {
+                id: `opp_chat_${Date.now()}`,
+                title: cmd.title || 'Opportunity from Copilot',
+                category: cmd.category || 'Hackathon',
+                cost: cmd.cost || 'Free',
+                deadline: cmd.deadline || getRelativeDateStr(7),
+                url: cmd.url || 'https://unstop.com',
+                eligibility: cmd.eligibility || 'Open to college students',
+                notes: cmd.notes || 'Added via Radar Copilot',
+                status: 'Interested',
+                saved: true,
+                isSample: false,
+                createdAt: new Date().toISOString()
+              };
+              state.opportunities.unshift(newOpp);
+              saveOpportunities();
+              renderAll();
+              actionExecutedLabel = `Logged "${newOpp.title}" to Opportunities (Deadline: ${newOpp.deadline})`;
+              showToast('Opportunity Logged via Copilot', newOpp.title, 'success');
+            }
+          } catch (cmdErr) {
+            console.warn('Failed to parse action command:', cmdErr);
+          }
+        }
+
+        const cleanDisplayText = aiRawResponse.replace(/<<<ACTION_COMMAND:[\s\S]*?>>>/g, '').trim();
+
+        chatHistory.push({
+          sender: 'bot',
+          text: cleanDisplayText || 'Task completed successfully! 🚀',
+          actionExecuted: actionExecutedLabel,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        saveChatHistory();
+        renderChatMessages();
+
+      } catch (err) {
+        console.error('Chat processing error:', err);
+        chatHistory.push({
+          sender: 'bot',
+          text: `⚠️ I had trouble connecting to Gemini. Please verify your internet connection or check your API key in **Backup & Settings**.`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        saveChatHistory();
+        renderChatMessages();
+      } finally {
+        typingIndicator.classList.add('hidden');
+        sendBtn.disabled = false;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+
+    function generateLocalFallbackResponse(query) {
+      const q = query.toLowerCase();
+      const today = getTodayIST();
+
+      if (q.includes('deadline') || q.includes('due') || q.includes('schedule') || q.includes('week')) {
+        const urgent = state.opportunities.filter(o => {
+          if (o.status === 'Completed') return false;
+          const c = calculateDaysRemaining(o.deadline);
+          return c.diffDays >= 0 && c.diffDays <= 7;
+        });
+        const due = state.reminders.filter(r => !r.completed);
+
+        let resp = `📅 **Here is your current deadline radar as of ${today}:**\n\n`;
+        if (urgent.length > 0) {
+          resp += `**⚡ Opportunities Closing Soon:**\n`;
+          urgent.forEach(o => resp += `• **${o.title}** - Due: ${o.deadline} (${o.category})\n`);
+        } else {
+          resp += `• No opportunities closing in the next 7 days.\n`;
+        }
+        if (due.length > 0) {
+          resp += `\n**⏰ Pending Academic Tasks:**\n`;
+          due.slice(0, 4).forEach(r => resp += `• **${r.title}** - Due: ${r.dueDate} (${r.priority} Priority)\n`);
+        } else {
+          resp += `• All tasks completed! Great job.\n`;
+        }
+        resp += `\n*(Tip: You can also configure your Gemini API key in **Backup & Settings** for personalized answers!)*`;
+        return resp;
+      }
+
+      if (q.includes('hackathon') || q.includes('contest') || q.includes('competition')) {
+        return `⚡ **Top Recommended Platforms for College Hackathons:**\n\n• **Unstop:** Premier Indian platform for engineering hackathons and hiring challenges.\n• **Devpost:** Global hackathon platform with prizes from Google, AWS, and OpenAI.\n• **Smart India Hackathon (SIH):** National engineering problem-solving initiative.\n• **HackerEarth:** Competitive programming and company sprint challenges.\n\nWould you like me to log an upcoming hackathon to your radar? Just type *"Add hackathon: [Name] due [Date]"*!`;
+      }
+
+      if (q.includes('cert') || q.includes('google cloud') || q.includes('azure') || q.includes('aws')) {
+        return `📜 **Top Free Certification & Voucher Tracks:**\n\n• **Google Cloud Skills Boost Arcade:** Complete skill badges to earn arcade points for exam discounts and official Google Cloud swag.\n• **Microsoft Learn Cloud Skills Challenge:** Often awards 50% to 100% exam vouchers for AZ-900 (Azure Fundamentals).\n• **AWS Skill Builder:** 600+ free digital courses for AWS Certified Cloud Practitioner preparation.`;
+      }
+
+      if (q.startsWith('add') || q.includes('remind me') || q.includes('task')) {
+        const sampleDate = getRelativeDateStr(3);
+        const taskTitle = query.replace(/^add/i, '').replace(/task/i, '').replace(/reminder/i, '').trim() || 'Study Goal';
+        return `I can add that task for you! 👍 Logging task...\n\n<<<ACTION_COMMAND: {"action":"add_reminder","title":"${escapeHTML(taskTitle)}","category":"Assignment","priority":"High","dueDate":"${sampleDate}","dueTime":"23:59","description":"Created via Radar Copilot"}>>>`;
+      }
+
+      return `👋 I am **Radar Copilot**! I can summarize your deadlines, recommend student programs, or add tasks to your personal radar.\n\nTo unlock autonomous intelligence, ensure your Gemini API key is active in **Backup & Settings**!`;
+    }
+
+    inputForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleSendMessage();
+    });
+
+    renderChatMessages();
+  }
+
+  // ==========================================================================
+  // 19. BOOTSTRAP APPLICATION
   // ==========================================================================
   function initApp() {
     loadStorageData();
@@ -3071,6 +3487,7 @@ Output strictly valid JSON array without markdown fences:
     initLiveClock();
     initBrowserNotifications();
     initEventBindings();
+    initRadarCopilotChatbot();
     renderAll();
 
     // Welcome banner / Radar scan message on launch

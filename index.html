@@ -1356,6 +1356,99 @@ Hey everyone! Registrations for Smart India Hackathon (SIH 2026) are now live! T
     </div>
   </div>
 
+  <!-- ========================================================================= -->
+  <!-- FLOATING AI COPILOT CHATBOT                                               -->
+  <!-- ========================================================================= -->
+
+  <!-- Floating Chatbot Launcher Button -->
+  <button class="chatbot-fab" id="chatbotFabBtn" aria-label="Open Gemini Radar Copilot Chat">
+    <div class="fab-sparkle">✨</div>
+    <div class="fab-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    </div>
+    <span class="fab-label">Radar Copilot</span>
+    <span class="fab-badge" id="chatNotifBadge">AI</span>
+  </button>
+
+  <!-- Chatbot Floating Window -->
+  <div class="chatbot-window hidden" id="chatbotWindow" role="dialog" aria-modal="true" aria-labelledby="chatBotTitle">
+    <!-- Chat Header -->
+    <div class="chatbot-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar">
+          <span>🤖</span>
+          <span class="chat-status-dot pulse"></span>
+        </div>
+        <div class="chat-title-group">
+          <div class="chat-title-row">
+            <h3 id="chatBotTitle">Radar Copilot</h3>
+            <span class="chat-model-badge">Gemini AI</span>
+          </div>
+          <span class="chat-subtitle" id="chatHeaderStatus">Ready & Context-Aware (IST)</span>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="btn-chat-icon" id="btnClearChatHistory" title="Clear conversation history">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+        <button class="btn-chat-icon" id="btnCloseChatWindow" aria-label="Minimize Chat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Suggestion Chips Carousel -->
+    <div class="chat-suggestions-box" id="chatSuggestionsBox">
+      <div class="suggestions-scroll">
+        <button class="suggestion-chip" data-prompt="What deadlines do I have coming up this week?">
+          ⚡ What's due this week?
+        </button>
+        <button class="suggestion-chip" data-prompt="Recommend top AI & Web hackathons for college students.">
+          🎯 Top hackathons
+        </button>
+        <button class="suggestion-chip" data-prompt="Add a high-priority assignment: DBMS Project Report due in 4 days">
+          📝 Add task with AI
+        </button>
+        <button class="suggestion-chip" data-prompt="How should I prepare for the Google Cloud Associate Cloud Engineer exam?">
+          📜 Google Cert prep plan
+        </button>
+        <button class="suggestion-chip" data-prompt="Write a professional message to find teammates for a 4-person hackathon team.">
+          👥 Team outreach message
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div class="chat-messages" id="chatMessagesContainer">
+      <!-- Populated via JS -->
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="chat-typing-indicator hidden" id="chatTypingIndicator">
+      <div class="typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-text">Copilot is thinking...</span>
+      </div>
+    </div>
+
+    <!-- Chat Input Area -->
+    <form class="chat-input-form" id="chatInputForm">
+      <div class="chat-input-wrapper">
+        <textarea id="chatInputText" rows="1" placeholder="Ask anything, log tasks, or search opportunities..." autocomplete="off"></textarea>
+        <button type="button" class="btn-chat-mic" id="btnChatMic" title="Voice Input (Speech-to-Text)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+      </div>
+      <button type="submit" class="btn-chat-send" id="btnChatSend" aria-label="Send Message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
